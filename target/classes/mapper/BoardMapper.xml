@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.party.board.dao.BoardDAO">
+
+	<select id="getAllBoard" resultType="boardVO">
+		SELECT *
+		FROM board b
+		JOIN member m ON b.mem_num = m.mem_num
+		WHERE b.lvl = 1 
+		ORDER BY b.GROUPNUM DESC, b.GROUPORD ASC
+
+	</select>
+
+	<insert id="boardInsert">
+	  DECLARE
+	    new_b_num NUMBER;
+	  BEGIN
+	    INSERT INTO BOARD (B_CONTENT, MEM_NUM)
+	    VALUES (#{b_content}, #{mem_num})
+	    RETURNING B_NUM INTO new_b_num;
+	    UPDATE BOARD SET GROUPNUM = new_b_num WHERE GROUPNUM = 0;
+	  END;
+	</insert>
+	
+	<insert id="answerInsert">
+	INSERT INTO BOARD (B_CONTENT,MEM_NUM,GROUPNUM,GROUPORD,LVL)
+	VALUES(#{b_content},#{mem_num},#{groupnum},#{groupord},#{lvl})
+	</insert>
+	
+	<update id="answerUpdate">
+		UPDATE BOARD SET GROUPORD=GROUPORD+1 WHERE GROUPNUM=#{groupnum} AND GROUPORD+1>#{groupord}
+	</update>
+	
+	<select id="answerOpen" resultType="boardVO">
+		SELECT *
+		FROM board b
+		JOIN member m ON b.mem_num = m.mem_num
+		WHERE b.lvl = 1 or b.groupnum= #{b_num}
+		ORDER BY b.GROUPNUM DESC, b.GROUPORD ASC
+	</select>
+	
+	<update id="boardDelete">
+	   UPDATE BOARD
+       SET b_content='삭제된 글 입니다'
+       WHERE b_num=${b_num}
+	</update>
+	
+</mapper>

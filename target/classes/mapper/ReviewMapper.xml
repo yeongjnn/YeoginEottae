@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.party.review.dao.ReviewDAO">
+
+   <select id="getTotalCountM" resultType="int">
+      SELECT COUNT(*)
+      FROM REVIEW
+   </select>
+   
+
+   <select id="getAllReview" resultType="reviewVO">
+      SELECT *
+      FROM (SELECT t.*,ROWNUM AS rnum
+         FROM(select rev.rev_num, rev.res_num, rev.rev_content, rev.rev_date, rev.star, m.nickname, r.room_name
+            from review rev, reservation res,room r,member m
+            where rev.RES_NUM = res.RES_NUM and res.mem_num = m.mem_num and res.room_num = r.room_num
+            order by rev.rev_num desc)t
+         WHERE <![CDATA[ROWNUM <= #{page2}]]>)
+      WHERE <![CDATA[rnum >= #{page}]]>   
+   </select>
+   
+   
+
+   <select id="getFilterReview" resultType="reviewVO">
+      SELECT *
+      FROM (SELECT t.*,ROWNUM AS rnum
+         FROM(select rev.rev_num, rev.res_num, rev.rev_content, rev.rev_date, rev.star,  m.nickname, r.room_name
+      from review rev, reservation res,room r,member m
+      where rev.res_num = res.res_num and res.mem_num = m.mem_num and res.room_num = r.room_num
+      <if test='review_search != null and review_filter != null and review_filter.equals("rev.star")'>
+           and rev.star = #{review_search}
+      </if>
+      <if test='review_search != null and review_filter != null and review_filter.equals("res.room_num")'>
+           and r.room_name like #{review_search}
+      </if>
+      order by rev.rev_num desc)t
+         WHERE <![CDATA[ROWNUM <= #{page2}]]>)
+      WHERE <![CDATA[rnum >= #{page}]]>   
+   </select>
+   
+      
+   
+   
+   
+   <insert id="reviewInsert">
+      INSERT INTO review (res_num, rev_content, star, rev_img_1, rev_img_2, rev_img_3)
+      VALUES (#{res_num}, #{rev_content}, #{star}, #{rev_img_1}, #{rev_img_2}, #{rev_img_3})
+   </insert>
+   
+   
+   <select id="myReview" resultType="reviewVO">
+      SELECT *
+      FROM (SELECT t.*,ROWNUM AS rnum
+         FROM(SELECT rev.rev_num, rev.res_num, rev.rev_content, rev.rev_date, rev.star, res.mem_num, res.room_num, room.room_name
+            FROM review rev, reservation res, room
+            WHERE res.mem_num = #{mem_num} and rev.res_num=res.res_num and res.room_num = room.room_num
+            ORDER BY rev.rev_num DESC)t
+         WHERE <![CDATA[ROWNUM <= #{page2}]]>)
+      WHERE <![CDATA[rnum >= #{page}]]>
+   </select>
+   
+      
+   
+   
+   <select id="myReviewDetail" resultType="reviewVO">
+      SELECT rev_content,rev_num,star,rev_img_1,rev_img_2,rev_img_3
+      FROM review
+      WHERE res_num=#{res_num}
+   </select>
+
+   <select id="myReviewDetail2" resultType="reservationVO">
+      SELECT res.res_num,res.room_num,substr(res.start_time,0,11)as start_time,substr(res.finish_time,0,11)as finish_time,res.options,res.people,r.room_name
+      FROM reservation res,room r
+      WHERE res_num=#{res_num} and res.room_num=r.room_num
+   </select>
+   
+   <update id="reviewUpdate">
+      UPDATE review 
+      SET rev_content=#{rev_content}, rev_date=SYSDATE, star=#{star}, rev_img_1=#{rev_img_1}, rev_img_2=#{rev_img_2}, rev_img_3=#{rev_img_3}
+      WHERE rev_num=#{rev_num}
+   </update>
+   
+   
+   <select id="getFilterTotal" resultType="int">
+      SELECT COUNT(*)
+      FROM review rev, reservation res,room r,member m
+      where rev.res_num = res.res_num and res.mem_num = m.mem_num and res.room_num = r.room_num
+      <if test='review_search != null and review_filter != null and review_filter.equals("rev.star")'>
+           and rev.star = #{review_search}
+      </if>
+      <if test='review_search != null and review_filter != null and review_filter.equals("res.room_num")'>
+           and r.room_name like #{review_search}
+      </if>
+      order by rev.rev_num desc
+   </select>
+   
+   <!-- 해당 파티룸 리뷰 전체 조회 -->
+   <select id="reviewOneAll" resultType="reviewVO">
+      SELECT m.nickname, rev.rev_content, rev.star, rev.rev_date, rev.rev_img_1, rev.rev_img_2, rev.rev_img_3
+      FROM review rev, reservation res, member m
+      WHERE rev.res_num = res.res_num
+         AND res.mem_num = m.mem_num
+         AND res.room_num = #{room_num}
+   </select>
+   
+   <delete id="reviewDelete">
+      DELETE FROM review
+      WHERE rev_num = #{rev_num}
+   </delete>
+   
+   <select id="getTotalCount2" resultType="int">
+      SELECT count(*)
+      FROM review rev, reservation res, room
+      WHERE res.mem_num = #{mem_num} and rev.res_num=res.res_num and res.room_num = room.room_num
+      ORDER BY rev.rev_num DESC
+   </select>
+   
+   
+</mapper>

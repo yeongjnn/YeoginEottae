@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<!-- VO만 설정? -->
+<configuration>
+	<typeAliases>
+		<typeAlias alias="memberVO" type="com.party.member.vo.MemberVO"/>
+		<typeAlias alias="roomVO" type="com.party.room.vo.RoomVO"/>
+		<typeAlias alias="reservationVO" type="com.party.reservation.vo.ReservationVO"/>
+		<typeAlias alias="reviewVO" type="com.party.review.vo.ReviewVO"/>
+		<typeAlias alias="noticeVO" type="com.party.notice.vo.NoticeVO"/>
+		<typeAlias alias="questionVO" type="com.party.question.vo.QuestionVO"/>
+		<typeAlias alias="likeVO" type="com.party.like.vo.LikeVO"/>
+		<typeAlias alias="boardVO" type="com.party.board.vo.BoardVO"/>
+		<typeAlias alias="res_timeVO" type="com.party.reservation.vo.Res_TimeVO"/>
+	</typeAliases>
+</configuration>

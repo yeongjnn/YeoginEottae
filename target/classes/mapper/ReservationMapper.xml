@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.party.reservation.dao.ReservationDAO">
+
+   <select id="getAllReservation" resultType="reservationVO">
+      select *
+      from reservation
+      order by res_num desc
+   </select>
+
+   <select id="getFilterReservation" resultType="reservationVO">
+      select *
+      from reservation
+      <if test='reservation_search != null and reservation_filter != null and reservation_filter.equals("room_num")'>
+         where room_num = #{reservation_search}
+      </if>
+      <if test='reservation_search != null and reservation_filter != null 
+         and reservation_filter.equals("start_time")'>
+         where substr(start_time, 3, 8) = #{reservation_search}
+      </if>
+      <if test='reservation_search != null and reservation_filter != null 
+         and reservation_filter.equals("res_time")'>
+         where substr(res_time, 1, 8) = #{reservation_search}
+      </if>
+      order by res_num desc
+   </select>
+
+   <select id="getMyReservation" resultType="reservationVO">
+      SELECT *
+		FROM (SELECT t.*,ROWNUM AS rnum
+			  FROM(select res_num,mem_num,r.room_num,play_time,substr(start_time,0,13)as start_time,substr(finish_time,0,13)as finish_time,
+					people,options,pay,cost,REPLACE(substr(start_time,3,8), '/', '') AS compare,r.room_name
+					from reservation res,room r
+					where mem_num=#{mem_num} and res.room_num = r.room_num
+					order by res_num desc)t
+			WHERE <![CDATA[ROWNUM <= #{page2}]]>)
+		WHERE <![CDATA[rnum >= #{page}]]>
+   </select>
+
+   <delete id="resDelete">
+      DELETE FROM reservation
+      WHERE res_num = #{res_num}
+   </delete>
+
+   <select id="resDetail" resultType="reservationVO">
+      SELECT res.res_num, res.room_num, substr(res.start_time,0,13) as  start_time, 
+      substr(res.finish_time,0,13) as finish_time, res.options, res.people, r.room_name, 
+      cost, play_time, res.imp_uid, res.merchant_uid
+      FROM reservation res,room r
+      WHERE res_num=#{res_num} and res.room_num=r.room_num
+   </select>
+
+   <select id="revCheck" resultType="reviewVO">
+      select *
+      from review
+   </select>
+
+   <insert id="insertReservation" parameterType="reservationVO">
+      INSERT INTO
+      RESERVATION (mem_num, room_num, start_time, finish_time, people, options, pay, cost, play_time, imp_uid, merchant_uid)
+      VALUES (#{mem_num}, #{room_num}, #{start_time}, #{finish_time}, #{people}, #{options}, 
+      #{pay}, #{cost}, #{play_time}, #{imp_uid}, #{merchant_uid})
+   </insert>
+   
+   <select id="getTotalCount" resultType="int">
+		SELECT COUNT(*)
+		FROM RESERVATION
+		WHERE mem_num=#{mem_num}
+	</select>
+
+</mapper>

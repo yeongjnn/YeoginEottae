@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.party.like.dao.LikeDAO">
+   <select id="likeListView" resultType="likeVO">
+      SELECT l.room_num,r.room_name
+      FROM LIKES l,ROOM r
+      WHERE MEM_NUM = #{mem_num} and l.room_num=r.room_num
+   </select>
+
+   <insert id="addLike" parameterType="likeVO">
+       INSERT INTO LIKES (MEM_NUM, ROOM_NUM)
+       VALUES (#{mem_num}, #{room_num})
+   </insert>
+
+
+	<select id="getOneRoom" resultType="roomVO">
+		SELECT room_num, purpose, price, width, bed, music, room_img_1, room_img_2, room_img_3, explanation,room_name
+		FROM ROOM
+		WHERE room_num=#{room_num}
+	</select>
+	
+	  <select id="checkLikeStatus" resultType="int" parameterType="map">
+        SELECT COUNT(*) FROM likes
+        WHERE room_num = #{room_num} AND mem_num = #{mem_num}
+    </select>
+	
+   <delete id="removeLike">
+       DELETE FROM LIKES WHERE MEM_NUM = #{mem_num} AND ROOM_NUM = #{room_num}
+   </delete>
+</mapper>

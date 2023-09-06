@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.party.member.dao.MemberDAO">
+
+	<select id="getAllMember" resultType="memberVO">
+		SELECT *
+		FROM MEMBER
+	</select>
+	
+	<update id="memberUpdate" >
+		UPDATE MEMBER
+		SET id=#{id},nickname=#{nickname},tel=#{tel},mem_moddate = sysdate
+		WHERE mem_num=#{mem_num}
+	</update>
+	
+	<update id="findPwUpdate" >
+		UPDATE MEMBER
+		SET pw=#{pw},mem_moddate = sysdate
+		WHERE id=#{id}
+	</update>
+
+	<delete id="memberDelete">
+		DELETE FROM MEMBER
+		WHERE mem_num=#{mem_num}
+	</delete>
+	
+	<select id="memberFilter" resultType="memberVO">
+	  SELECT *
+	  FROM MEMBER
+	  <where>
+	  <if test="memberFilter == 'MEM_NUM'">
+      	AND UPPER(MEM_NUM) like #{memberSearch}
+      </if>
+      
+      <if test="memberFilter == 'ID'">
+      	AND UPPER(ID) like #{memberSearch}
+      </if>
+      
+      <if test="memberFilter == 'NICKNAME'">
+      	AND UPPER(NICKNAME) like #{memberSearch}
+      </if>
+      
+      <if test="memberFilter == 'TEL'">
+      	AND UPPER(TEL) like #{memberSearch}
+      </if>
+      
+      </where>
+	</select>
+	
+	<select id="idCheck" parameterType="String" resultType="int">
+      SELECT  COUNT(*)
+      FROM MEMBER
+      WHERE id = #{id}
+   </select>
+
+   <select id="telCheck" parameterType="String" resultType="int">
+      SELECT  COUNT(*)
+      FROM MEMBER
+      WHERE tel = #{tel}
+   </select>
+
+   <select id="nameCheck" parameterType="String" resultType="int">
+      SELECT  COUNT(*)
+      FROM MEMBER
+      WHERE nickname = #{nickname}
+   </select>
+
+   <insert id="insertMember">
+      INSERT INTO MEMBER(id, pw, nickname, tel)
+      VALUES (#{id}, #{pw}, #{nickname}, #{tel})
+   </insert>
+   
+   
+   <select id="getMyInfo" resultType="memberVO">
+		SELECT *
+		FROM MEMBER
+		WHERE MEM_NUM=#{mem_num}
+	</select>
+	
+	<update id="myPageUpdate">
+		UPDATE MEMBER
+		SET ID=#{id},PW=#{pw},NICKNAME=#{nickname},TEL=#{tel}
+		WHERE MEM_NUM=#{mem_num}
+	</update>
+	
+	<select id="getTotalCount" resultType="int">
+		SELECT COUNT(*)
+		FROM MEMBER
+	</select>
+	
+	<select id="getList" resultType="memberVO">
+		SELECT *
+		FROM (SELECT t.*,ROWNUM AS rnum
+			  FROM (SELECT *	
+			  		FROM MEMBER
+			  		ORDER BY MEM_NUM ASC)t
+			  WHERE <![CDATA[ROWNUM <= #{page2}]]>)
+		WHERE <![CDATA[rnum >= #{page}]]>
+	</select>
+	
+	<select id="getFilterTotal" resultType="int">
+		SELECT COUNT(*)
+		FROM MEMBER
+		<where>
+	  <if test="memberFilter == 'MEM_NUM'">
+      	AND UPPER(MEM_NUM) like #{memberSearch}
+      </if>
+      
+      <if test="memberFilter == 'ID'">
+      	AND UPPER(ID) like #{memberSearch}
+      </if>
+      
+      <if test="memberFilter == 'NICKNAME'">
+      	AND UPPER(NICKNAME) like #{memberSearch}
+      </if>
+      
+      <if test="memberFilter == 'TEL'">
+      	AND UPPER(TEL) like #{memberSearch}
+      </if>     
+      </where>
+	</select>
+	
+
+	<select id="getFilterList" resultType="memberVO">
+	SELECT *
+    FROM (SELECT t.*, ROWNUM AS rnum
+          FROM (
+	            SELECT *
+	            FROM MEMBER
+	            <where>
+	                <if test="memberFilter == 'MEM_NUM'">
+	                    AND UPPER(MEM_NUM) LIKE #{memberSearch}
+	                </if>
+	                <if test="memberFilter == 'ID'">
+	                    AND UPPER(ID) LIKE #{memberSearch}
+	                </if>
+	                <if test="memberFilter == 'NICKNAME'">
+	                    AND UPPER(NICKNAME) LIKE #{memberSearch}
+	                </if>
+	                <if test="memberFilter == 'TEL'">
+	                    AND UPPER(TEL) LIKE #{memberSearch}
+	                </if>
+	            </where>
+	            ORDER BY MEM_NUM ASC) t
+       	WHERE <![CDATA[ROWNUM <= #{page2}]]>)	 
+    WHERE <![CDATA[rnum >= #{page}]]>
+	</select>
+	
+</mapper>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.party.question.dao.QuestionDAO">
+	<select id="getTotalCount" resultType="int">
+		SELECT COUNT(*)
+		FROM question
+	</select>
+	
+	<select id="getAllQuestion" resultType="questionVO">
+		SELECT *
+		FROM (SELECT t.*,ROWNUM AS rnum
+			FROM(SELECT q.q_num, q.mem_num, m.nickname, q.q_title, q.q_content, q.q_date, q.answer, q.ans_date
+				FROM question q,member m
+				WHERE q.mem_num=m.mem_num
+				ORDER BY Q_NUM DESC)t
+			WHERE <![CDATA[ROWNUM <= #{page2}]]>)
+		WHERE <![CDATA[rnum >= #{page}]]>	
+
+	</select>
+	
+	<select id="getQuestion" resultType="questionVO">
+		SELECT q_num, mem_num, q_title, q_content, q_date, answer, ans_date
+		FROM question
+		WHERE q_num = #{q_num}
+	</select>
+	
+	<select id="questionMyOne" resultType="questionVO">
+		SELECT *
+		FROM (SELECT t.*,ROWNUM AS rnum
+			FROM(SELECT q_num, mem_num, q_title, q_content, q_date, answer, ans_date
+				FROM question
+				WHERE mem_num = #{mem_num}
+				ORDER BY q_date DESC)t
+			WHERE <![CDATA[ROWNUM <= #{page2}]]>)
+		WHERE <![CDATA[rnum >= #{page}]]>	
+	</select>
+	
+	
+	
+	
+	<insert id="insertQuestion">
+		INSERT INTO question (mem_num, q_title, q_content)
+		VALUES (#{mem_num}, #{q_title}, #{q_content})
+	</insert>
+	
+	<update id="updateQuestion">
+		UPDATE question SET answer=#{answer},
+		ans_date=SYSDATE 
+		WHERE q_num=#{q_num}
+	</update>
+	
+	<delete id="deleteQuestion">
+		DELETE FROM question
+		WHERE q_num = #{q_num}
+	</delete>
+	
+	<!-- 제목이나 내용 검색 -->
+	<select id="filterQuestion" resultType="questionVO">
+		SELECT *
+		FROM question 
+		WHERE (UPPER(q_title)
+		like #{question_search}OR 
+		UPPER(q_content)
+		like #{question_search})
+		and mem_num = #{mem_num}
+		ORDER BY Q_NUM DESC
+	</select>
+
+	<!-- 회원번호로만 검색 -->
+	<select id="filterQuestion1" resultType="questionVO">
+		SELECT *
+		FROM (SELECT t.*,ROWNUM AS rnum
+			FROM(SELECT q.*,m.nickname
+				FROM question q,member m
+				WHERE q.mem_num=m.mem_num and q.MEM_NUM like #{question_search}
+				ORDER BY Q_NUM DESC)t
+			WHERE <![CDATA[ROWNUM <= #{page2}]]>)
+		WHERE <![CDATA[rnum >= #{page}]]>	
+	</select>
+	
+	<select id="getFilterTotal" resultType="int">
+		SELECT COUNT(*)
+		FROM question
+		WHERE MEM_NUM like #{question_search}
+	</select>
+	
+	<select id="getTotalCount2" resultType="int">
+		SELECT COUNT(*)
+		FROM question
+		WHERE mem_num = #{mem_num}
+	</select>
+
+</mapper>

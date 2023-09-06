@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.party.room.dao.RoomDAO">
+
+	<!-- 파티룸 전체 조회 -->
+	<select id="getAllRoom" resultType="roomVO">
+		SELECT room_num, purpose, price, width, bed, music, room_img_1, room_img_2, room_img_3, explanation
+		FROM ROOM
+	</select>
+	
+	<!-- 베이직룸 전체 조회 -->
+	<select id="getAllBasic" resultType="roomVO">
+	  SELECT room_num, purpose, price, width, bed, music, room_img_1, room_img_2, room_img_3, explanation
+	  FROM ROOM
+	  WHERE purpose = '기본'
+	  <choose>
+	    <when test="bedOption == '싱글'">
+	      AND bed = '싱글'
+	    </when>
+	    <when test="bedOption == '없음'">
+	      AND bed = '없음'
+	    </when>
+	     <when test="bedOption == '더블'">
+	      AND bed = '더블'
+	    </when>
+	    <when test="bedOption == '퀸사이즈'">
+	      AND bed = '퀸'
+	    </when>
+	    
+	  </choose>
+	  <choose>
+	    <when test="musicOption == '있음'">
+	      AND music = '있음'
+	    </when>
+	    <when test="musicOption == '없음'">
+	      AND music = '없음'
+	    </when>
+	  </choose>
+	</select>
+	
+	<!-- 쿠킹룸 전체 조회 -->
+	<select id="getAllCooking" resultType="roomVO">
+		SELECT room_num, purpose, price, width, bed, music, room_img_1, room_img_2, room_img_3, explanation
+		FROM ROOM
+		WHERE purpose = '주방 포함'
+		<choose>
+		  <when test="bedOption == '싱글'">
+		    AND bed = '싱글'
+		  </when>
+     	  <when test="bedOption == '없음'">
+	        AND bed = '없음'
+		  </when>
+		  <when test="bedOption == '더블'">
+		    AND bed = '더블'
+		  </when>
+	      <when test="bedOption == '퀸사이즈'">
+	        AND bed = '퀸'
+	      </when>
+		    
+	    </choose>
+		<choose>
+	       <when test="musicOption == '있음'">
+	        AND music = '있음'
+	       </when>
+	       <when test="musicOption == '없음'">
+	        AND music = '없음'
+	       </when>
+	    </choose>
+	</select>		
+	
+	<!-- 키즈룸 전체 조회 -->
+	<select id="getAllKids" resultType="roomVO">
+		SELECT room_num, purpose, price, width, bed, music, room_img_1, room_img_2, room_img_3, explanation
+		FROM ROOM
+		WHERE purpose = '키즈 전용'
+		<choose>
+		  <when test="bedOption == '싱글'">
+		    AND bed = '싱글'
+		  </when>
+     	  <when test="bedOption == '없음'">
+	        AND bed = '없음'
+		  </when>
+		  <when test="bedOption == '더블'">
+		    AND bed = '더블'
+		  </when>
+	      <when test="bedOption == '퀸사이즈'">
+	        AND bed = '퀸'
+	      </when>
+		    
+	    </choose>
+		<choose>
+	       <when test="musicOption == '있음'">
+	        AND music = '있음'
+	       </when>
+	       <when test="musicOption == '없음'">
+	        AND music = '없음'
+	       </when>
+	    </choose>
+	</select>	
+	
+	<!-- 루프탑 전체 조회 -->
+	<select id="getAllRooftop" resultType="roomVO">
+		SELECT room_num, purpose, price, width, bed, music, room_img_1, room_img_2, room_img_3, explanation
+		FROM ROOM
+		WHERE purpose = '루프탑'
+	</select>
+	
+	<!-- 관리자 - 페이징 위한 전체 수 조회 -->
+	<select id="getTotalCount" resultType="int">
+		SELECT COUNT(*)
+		FROM ROOM
+	</select>
+	
+	<!-- 관리자 - 페이지 전체 리스트 -->
+	<select id="getList" resultType="RoomVO">
+		SELECT *
+		FROM (SELECT t.*,ROWNUM AS rnum
+			  FROM (SELECT *	
+			  		FROM ROOM
+			  		ORDER BY ROOM_NUM ASC)t
+			  WHERE <![CDATA[ROWNUM <= #{page2}]]>)
+		WHERE <![CDATA[rnum >= #{page}]]>
+	</select>
+	
+	
+	<!-- 관리자 - 페이징 위한 전체 수 조회 -->
+	<select id="getFilterTotal" resultType="int">
+		SELECT COUNT(*)
+		FROM ROOM
+		WHERE 1 = 1
+		<choose>
+		<when test="bedOption == '싱글'">
+	    	AND bed = '싱글'
+	    </when>
+	    <when test="bedOption == '없음'">
+	    	AND bed = '없음'
+	    </when>
+	    <when test="bedOption == '더블'">
+	 	    AND bed = '더블'
+		</when>
+		<when test="bedOption == '퀸사이즈'">
+		    AND bed = '퀸'
+		</when>
+			    
+		</choose>
+		<choose>
+		<when test="musicOption == '있음'">
+		    AND music = '있음'
+		</when>
+		<when test="musicOption == '없음'">
+		    AND music = '없음'
+		</when>
+		</choose>
+	</select>
+	
+	
+	
+	<select id="getFilterList" resultType="RoomVO">
+		SELECT *
+		FROM (SELECT t.*,ROWNUM AS rnum
+			  FROM (SELECT room_num, purpose, price, width, bed, music, room_img_1, room_img_2, room_img_3, explanation
+					  FROM ROOM
+					  WHERE 1 = 1
+					  <choose>
+					    <when test="bedOption == '싱글'">
+					      AND bed = '싱글'
+					    </when>
+					    <when test="bedOption == '없음'">
+					      AND bed = '없음'
+					    </when>
+					     <when test="bedOption == '더블'">
+					      AND bed = '더블'
+					    </when>
+					    <when test="bedOption == '퀸사이즈'">
+					      AND bed = '퀸'
+					    </when>
+					    
+					  </choose>
+					  <choose>
+					    <when test="musicOption == '있음'">
+					      AND music = '있음'
+					    </when>
+					    <when test="musicOption == '없음'">
+					      AND music = '없음'
+					    </when>
+					  </choose>
+					  ORDER BY ROOM_NUM ASC)t
+			  WHERE <![CDATA[ROWNUM <= #{page2}]]>)
+		WHERE <![CDATA[rnum >= #{page}]]>
+	</select>
+	
+	
+	<!-- 관리자 - 방 추가하기 -->
+	<insert id="insertRoom">
+		INSERT INTO room(purpose, price, width, bed, music, room_img_1, room_img_2, room_img_3, explanation, room_name)
+		VALUES (#{purpose}, #{price}, #{width}, #{bed}, #{music}, #{room_img_1}, #{room_img_2}, #{room_img_3}, #{explanation}, #{room_name})
+	</insert>
+   
+   <!-- 관리자 방 수정하기 -->
+   <insert id="updateRoom">
+      UPDATE ROOM
+      SET room_name=#{room_name},purpose=#{purpose},price=#{price},width=#{width},bed=#{bed},music=#{music},
+      	room_img_1=#{room_img_1},room_img_2=#{room_img_2},room_img_3=#{room_img_3},explanation=#{explanation},room_moddate=SYSDATE
+      	WHERE room_num=#{room_num}
+   </insert>
+   
+   <select id="getFilterTotalM" resultType="int">
+		SELECT COUNT(*)
+		FROM ROOM
+		<where>
+	  <if test="roomFilter == 'ROOM_NAME'">
+      	AND UPPER(room_name) like #{roomSearch}
+      </if>
+    
+      </where>
+	</select>
+	
+	<select id="getFilterListM" resultType="roomVO">
+		SELECT *
+		FROM (SELECT t.*,ROWNUM AS rnum
+			  FROM (SELECT *
+		            FROM ROOM
+	                WHERE room_name like #{roomSearch}     
+		            ORDER BY room_num ASC)t
+			  WHERE <![CDATA[ROWNUM <= #{page2}]]>)
+		WHERE <![CDATA[rnum >= #{page}]]>
+	</select>
+	
+		<!-- 파티룸 개별 조회 -->
+	<select id="getOneRoom" resultType="roomVO">
+		SELECT room_num, purpose, price, width, bed, music, room_img_1, room_img_2, room_img_3, explanation, room_name
+		FROM ROOM
+		WHERE room_num=#{room_num}
+	</select>
+	
+	
+</mapper>
